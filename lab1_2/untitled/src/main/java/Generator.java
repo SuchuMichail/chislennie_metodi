@@ -2,194 +2,6 @@ public class Generator {
     public Generator() {
     }
 
-    public double[][] matrixDifference(double[][] first, double[][] second){
-        double[][] result = new double[first.length][first.length];
-        for(int i=0;i< first.length;i++){
-            for(int j=0;j< first.length;j++){
-                result[i][j]=first[i][j]-second[i][j];
-            }
-        }
-        return result;
-    }
-
-    public double getNormOfMatrix(double[][] matrix) {
-        double n = matrix.length;
-        double norm = 0;
-        double sum;
-
-        for (int i = 0; i < n; i++) {
-            sum = 0;
-            for (int j = 0; j < n; j++) {
-                sum += Math.abs(matrix[i][j]);
-            }
-            if (sum > norm) {
-                norm = sum;
-            }
-        }
-
-        return norm;
-    }
-
-    public double[][] multiplyTwoMatrix(double[][] matrixOne, double[][] matrixTwo) {
-        int n = matrixOne.length;
-        int m = matrixTwo[0].length;
-        int countStrTwo = matrixTwo.length;
-        int countColumnsOne = matrixOne[0].length;
-
-        if (countStrTwo != countColumnsOne) {
-            return null;
-        }
-
-        double[][] matrix = new double[n][m];
-
-        double support;
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                support = 0;
-                for (int k = 0; k < countStrTwo; k++) {
-                    support += matrixOne[i][k] * matrixTwo[k][j];
-                }
-                matrix[i][j] = support;
-            }
-        }
-
-        return matrix;
-    }
-
-    public double[][] invertMatrix(double[][] matrix) {
-        int n = matrix.length;
-
-        double[][] inv = new double[n][n];
-
-        double[][] lumatrix = decomposeToLU(matrix);
-        //double[][] matrixL = getL(lumatrix);
-        //double[][] matrixU = getU(lumatrix);
-
-        double supportL;
-        double supportU;
-        double supportMM;
-
-        inv[n - 1][n - 1] = 1 / lumatrix[n - 1][n - 1];
-
-        for (int m = n - 1; m >= 0; m--) {
-            supportMM = 0;
-            for (int k = m + 1; k < n; k++) {
-                supportMM += lumatrix[m][k] * inv[k][m];
-            }
-            inv[m][m] = (1 - supportMM) / lumatrix[m][m];
-
-            for (int i = m - 1; i >= 0; i--) {
-                supportL = 0;
-                supportU = 0;
-                for (int k = i + 1; k < n; k++) {
-                    supportL += lumatrix[k][i] * inv[m][k];
-                    supportU += lumatrix[i][k] * inv[k][m];
-                }
-                inv[m][i] = -supportL;
-                inv[i][m] = -supportU / lumatrix[i][i];
-            }
-        }
-
-        return inv;
-    }
-
-    public double[][] decomposeToLU(double[][] matrix) {
-        int n = matrix.length;
-        double[][] lumatrix = new double[n][n];
-
-        double support;
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                lumatrix[i][j] = 0;
-                if (i == j) {
-                    lumatrix[i][j] = 1;
-                }
-            }
-        }
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                support = 0;
-                if (i <= j) {
-                    for (int k = 0; k < i; k++) {
-                        support += lumatrix[i][k] * lumatrix[k][j];
-                    }
-                    lumatrix[i][j] = matrix[i][j] - support;
-                } else {
-                    for (int k = 0; k < j; k++) {
-                        support += lumatrix[i][k] * lumatrix[k][j];
-                    }
-                    lumatrix[i][j] = (matrix[i][j] - support) / lumatrix[j][j];
-                }
-            }
-        }
-/*
-        for (int k = 0; k < n; k++) {
-            for (int j = k; j < n; j++) {
-                support = 0;
-                for (int h = 0; h < k; h++) {
-                    support += lumatrix[k][h] * lumatrix[h][j];
-                }
-                lumatrix[k][j] = matrix[k][j] - support;
-            }
-            for (int i = k + 1; i < n; i++) {
-                support = 0;
-                for (int h = 0; h < k; h++) {
-                    support += lumatrix[i][h] * lumatrix[h][k];
-                }
-                lumatrix[i][k] = (matrix[i][k] - support) / lumatrix[k][k];
-            }
-        }
-*/
-        return lumatrix;
-    }
-
-    public double[][] getL(double[][] lumatrix) {
-        int n = lumatrix.length;
-        double[][] matrixL = new double[n][n];
-
-        for (int i = 0; i < n; i++) {
-            System.arraycopy(lumatrix[i], 0, matrixL[i], 0, n);
-        }
-
-        for (int i = 0; i < n; i++) {
-            matrixL[i][i] = 1;
-            for (int j = i + 1; j < n; j++) {
-                matrixL[i][j] = 0;
-            }
-        }
-        return matrixL;
-    }
-
-    public double[][] getU(double[][] lumatrix) {
-        int n = lumatrix.length;
-        double[][] matrixU = new double[n][n];
-
-        for (int i = 0; i < n; i++) {
-            System.arraycopy(lumatrix[i], 0, matrixU[i], 0, n);
-        }
-
-        for (int i = 1; i < n; i++) {
-            for (int j = 0; j < i; j++) {
-                matrixU[i][j] = 0;
-            }
-        }
-
-        return matrixU;
-    }
-
-    public void printMatrix(double[][] a) {
-        int n = a.length;
-        int m = a[0].length;
-        for (int i = 0; i < n; ++i) {
-            for (int j = 0; j < m; ++j) {
-                System.out.print(a[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
     public double matrixInfNorm(double[][] a, int n) {
         double norm = 0.0;
         for (int i = 0; i < n; ++i) {
@@ -236,24 +48,19 @@ public class Generator {
         }
     }
 
-    public void myGen(double[][] a, double[][] a_inv, int n, double alpha, double beta, int sign_law, int lambda_law, int variant, int schema) {
-        System.out.println("   M A T R I X  G E N.  ");
-        System.out.println("              N = " + n);
-        System.out.println(" | lambda_min | = " + alpha);
-        System.out.println(" | lambda_max | = " + beta);
-        double[] lambda = new double[n];
-        System.out.println(" sign_law = " + sign_law);
+    public double[] myGen(double[][] a, double[][] a_inv, int n, double alpha, double beta, int sign_law, int lambda_law, int variant, int schema) {
         double[] sign = new double[n];
         int i;
-        for (i = 0; i < n; ++i) {
+        for(i = 0; i < n; ++i) {
             sign[i] = 1.0;
         }
+
         label478:
         switch (sign_law) {
             case -1:
                 i = 0;
 
-                while (true) {
+                while(true) {
                     if (i >= n) {
                         break label478;
                     }
@@ -263,21 +70,24 @@ public class Generator {
                 }
             case 0:
                 sign[0] = 1.0;
-                for (i = 1; i < n; ++i) {
+
+                for(i = 1; i < n; ++i) {
                     sign[i] = -sign[i - 1];
                 }
         }
-        System.out.println(" lambda_law = " + lambda_law);
+
         double[] kappa = new double[n];
-        for (i = 0; i < n; ++i) {
-            kappa[i] = (double) i / (double) (n - 1);
+
+        for(i = 0; i < n; ++i) {
+            kappa[i] = (double)i / (double)(n - 1);
         }
+
         label458:
         switch (lambda_law) {
             case 1:
-                System.out.println(" kappa = sqrt( ) ");
                 i = 0;
-                while (true) {
+
+                while(true) {
                     if (i >= n) {
                         break label458;
                     }
@@ -286,170 +96,208 @@ public class Generator {
                     ++i;
                 }
             case 2:
-                System.out.println(" kappa = sin( ) ");
                 double pi_half = Math.acos(-1.0) * 0.5;
 
-                for (i = 0; i < n; ++i) {
+                for(i = 0; i < n; ++i) {
                     kappa[i] = Math.sin(pi_half * kappa[i]);
                 }
         }
+
         double[] J = new double[n];
-        for (i = 0; i < n; ++i) {
+
+        for(i = 0; i < n; ++i) {
             J[i] = sign[i] * ((1.0 - kappa[i]) * alpha + kappa[i] * beta);
         }
+
         double[] J_inv = new double[n];
-        for (i = 0; i < n; ++i) {
+
+        for(i = 0; i < n; ++i) {
             J_inv[i] = 1.0 / J[i];
         }
+
         double[][] Q = new double[n][];
-        for (i = 0; i < n; ++i) {
+
+        for(i = 0; i < n; ++i) {
             Q[i] = new double[n];
         }
+
         double s;
         double[] aa = new double[3];
-        System.out.println(" variant = " + variant);
         int j;
         label426:
         switch (variant) {
-            case 0 -> {
-                System.out.println(" simmetric matrix:");
-                System.out.println(" schema = " + schema);
+            case 0:
                 if (schema == 1) {
                     this.Q_matrix(Q, n, schema);
                     a[0][0] = 0.0;
+
                     int k;
                     for (k = 0; k < n; ++k) {
                         a[0][0] += Q[0][k] * J[k] * Q[0][k];
                     }
+
                     for (j = 1; j < n; ++j) {
                         a[0][j] = 0.0;
+
                         for (k = j - 1; k < n; ++k) {
                             a[0][j] += Q[0][k] * J[k] * Q[j][k];
                         }
+
                         a[j][0] = a[0][j];
                     }
+
                     for (i = 1; i < n; ++i) {
                         a[i][i] = 0.0;
+
                         for (k = i - 1; k < n; ++k) {
                             a[i][i] += Q[i][k] * J[k] * Q[i][k];
                         }
+
                         for (j = i + 1; j < n; ++j) {
                             a[i][j] = 0.0;
+
                             for (k = j - 1; k < n; ++k) {
                                 a[i][j] += Q[i][k] * J[k] * Q[j][k];
                             }
+
                             a[j][i] = a[i][j];
                         }
                     }
+
                     a_inv[0][0] = 0.0;
+
                     for (k = 0; k < n; ++k) {
                         a_inv[0][0] += Q[0][k] * J_inv[k] * Q[0][k];
                     }
+
                     for (j = 1; j < n; ++j) {
                         a_inv[0][j] = 0.0;
+
                         for (k = j - 1; k < n; ++k) {
                             a_inv[0][j] += Q[0][k] * J_inv[k] * Q[j][k];
                         }
+
                         a_inv[j][0] = a_inv[0][j];
                     }
+
                     for (i = 1; i < n; ++i) {
                         a_inv[i][i] = 0.0;
+
                         for (k = i - 1; k < n; ++k) {
                             a_inv[i][i] += Q[i][k] * J_inv[k] * Q[i][k];
                         }
+
                         for (j = i + 1; j < n; ++j) {
                             a_inv[i][j] = 0.0;
+
                             for (k = j - 1; k < n; ++k) {
                                 a_inv[i][j] += Q[i][k] * J_inv[k] * Q[j][k];
                             }
+
                             a_inv[j][i] = a_inv[i][j];
                         }
                     }
                 }
-            }
-            case 1 -> {
-                System.out.println(" simple structure matrix:");
-                System.out.println(" schema = " + schema);
+                break;
+            case 1:
                 if (schema == 1) {
                     a[0][0] = J[0];
                     a[0][1] = -J[1];
+
                     for (i = 1; i < n - 1; ++i) {
                         a[i][i - 1] = -J[i - 1];
                         a[i][i] = J[i] + J[i];
                         a[i][i + 1] = -J[i + 1];
                     }
+
                     a[n - 1][n - 2] = -J[n - 2];
                     a[n - 1][n - 1] = J[n - 1] + J[n - 1];
                     aa[1] = a[0][0];
                     aa[2] = a[0][1];
                     a[0][0] = aa[1] * (double) n + aa[2] * (double) (n - 1);
                     s = aa[1] + aa[2];
+
                     for (j = 1; j < n; ++j) {
                         a[0][j] = s * (double) (n - j);
                     }
+
                     for (i = 1; i < n - 1; ++i) {
                         aa[0] = a[i][i - 1];
                         aa[1] = a[i][i];
                         aa[2] = a[i][i + 1];
+
                         for (j = 0; j < i; ++j) {
                             a[i][j] = aa[0] * (double) (n - i + 1) + aa[1] * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         }
+
                         s = aa[0] + aa[1];
                         a[i][i] = s * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         s += aa[2];
+
                         for (j = i + 1; j < n; ++j) {
                             a[i][j] = s * (double) (n - j);
                         }
                     }
+
                     aa[0] = a[n - 1][n - 2];
                     aa[1] = a[n - 1][n - 1];
                     s = aa[0] + aa[0] + aa[1];
+
                     for (j = 0; j < n - 1; ++j) {
                         a[n - 1][j] = s;
                     }
+
                     a[n - 1][n - 1] = aa[0] + aa[1];
                     a_inv[0][0] = J_inv[0];
                     a_inv[0][1] = -J_inv[1];
+
                     for (i = 1; i < n - 1; ++i) {
                         a_inv[i][i - 1] = -J_inv[i - 1];
                         a_inv[i][i] = J_inv[i] + J_inv[i];
                         a_inv[i][i + 1] = -J_inv[i + 1];
                     }
+
                     a_inv[n - 1][n - 2] = -J_inv[n - 2];
                     a_inv[n - 1][n - 1] = J_inv[n - 1] + J_inv[n - 1];
                     aa[1] = a_inv[0][0];
                     aa[2] = a_inv[0][1];
                     a_inv[0][0] = aa[1] * (double) n + aa[2] * (double) (n - 1);
                     s = aa[1] + aa[2];
+
                     for (j = 1; j < n; ++j) {
                         a_inv[0][j] = s * (double) (n - j);
                     }
+
                     for (i = 1; i < n - 1; ++i) {
                         aa[0] = a_inv[i][i - 1];
                         aa[1] = a_inv[i][i];
                         aa[2] = a_inv[i][i + 1];
+
                         for (j = 0; j < i; ++j) {
                             a_inv[i][j] = aa[0] * (double) (n - i + 1) + aa[1] * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         }
+
                         s = aa[0] + aa[1];
                         a_inv[i][i] = s * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         s += aa[2];
+
                         for (j = i + 1; j < n; ++j) {
                             a_inv[i][j] = s * (double) (n - j);
                         }
                     }
+
                     aa[0] = a_inv[n - 1][n - 2];
                     aa[1] = a_inv[n - 1][n - 1];
                     s = aa[0] + aa[0] + aa[1];
+
                     for (j = 0; j < n - 1; ++j) {
                         a_inv[n - 1][j] = s;
                     }
+
                     a_inv[n - 1][n - 1] = aa[0] + aa[1];
                 }
-            }
-            case 2 -> {
-                System.out.println(" J_2 type matrix: must be n > 2");
-                System.out.println(" schema = " + schema);
+                break;
+            case 2:
                 if (schema == 1) {
                     a[0][0] = J[0];
                     a[0][1] = 1.0 - J[0];
@@ -481,12 +329,15 @@ public class Generator {
                         aa[0] = a[i][i - 1];
                         aa[1] = a[i][i];
                         aa[2] = a[i][i + 1];
+
                         for (j = 0; j < i; ++j) {
                             a[i][j] = aa[0] * (double) (n - i + 1) + aa[1] * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         }
+
                         s = aa[0] + aa[1];
                         a[i][i] = s * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         s += aa[2];
+
                         for (j = i + 1; j < n; ++j) {
                             a[i][j] = s * (double) (n - j);
                         }
@@ -528,6 +379,7 @@ public class Generator {
                         aa[0] = a_inv[i][i - 1];
                         aa[1] = a_inv[i][i];
                         aa[2] = a_inv[i][i + 1];
+
                         for (j = 0; j < i; ++j) {
                             a_inv[i][j] = aa[0] * (double) (n - i + 1) + aa[1] * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         }
@@ -535,6 +387,7 @@ public class Generator {
                         s = aa[0] + aa[1];
                         a_inv[i][i] = s * (double) (n - i) + aa[2] * (double) (n - i - 1);
                         s += aa[2];
+
                         for (j = i + 1; j < n; ++j) {
                             a_inv[i][j] = s * (double) (n - j);
                         }
@@ -547,23 +400,26 @@ public class Generator {
                     }
                     a_inv[n - 1][n - 1] = aa[0] + aa[1];
                 }
-            }
         }
+
+        double[] values = new double[4];
         s = this.matrixInfNorm(a, n);
-        System.out.println(" ||  A  || = " + s);
+        values[0] = s;
         double norm_inv = this.matrixInfNorm(a_inv, n);
-        System.out.println(" ||A_inv|| = " + norm_inv);
+        values[1] = norm_inv;
         double obusl = s * norm_inv;
-        System.out.println(" obusl = " + obusl);
+        values[2] = obusl;
         double[][] r = new double[n][];
-        for (i = 0; i < n; ++i) {
+        for(i = 0; i < n; ++i) {
             r[i] = new double[n];
         }
         this.matrixMul(a, a_inv, r, n);
-        for (i = 0; i < n; ++i) {
-            int var10002 = (int) r[i][i]--;
+        for(i = 0; i < n; ++i) {
+            r[i][i]--;
         }
+
         s = this.matrixInfNorm(r, n);
-        System.out.println(" ||R_gen|| = " + s);
+        values[3] = s;
+        return values;
     }
 }
