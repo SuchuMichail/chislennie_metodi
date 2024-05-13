@@ -20,7 +20,7 @@ public class MinimalNevyazki {
         do {
             y = MatrixService.matrixDifference(MatrixService.multiplyMatrixOnVector(matrixA, resX), vecB);
             support = MatrixService.multiplyMatrixOnVector(matrixA, y);
-            t = MatrixService.getScalarVec(y, support) / MatrixService.getScalarVec(support, support);
+            t = MatrixService.multiplyVectorOnVector(y, support) / MatrixService.multiplyVectorOnVector(support, support);
             resX = MatrixService.matrixDifference(resX, MatrixService.multiplyVecOnNumber(t, y));
 
             criteria = MatrixService.find2NormVec(MatrixService.matrixDifference(
