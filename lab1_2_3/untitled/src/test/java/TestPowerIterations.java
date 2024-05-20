@@ -81,4 +81,12 @@ public class TestPowerIterations {
         double maxAAB = tupleAAB.getSecond();
         System.out.println("maxAAB = " + maxAAB);
     }
+
+    @Test
+    public void testDeterminantCalc(){
+        double[][] matrixA = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        DeterminantCalc determinantCalc = new DeterminantCalc(matrixA);
+
+        System.out.println(determinantCalc.determinant());
+    }
 }
