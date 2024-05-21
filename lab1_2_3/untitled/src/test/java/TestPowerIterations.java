@@ -36,7 +36,7 @@ public class TestPowerIterations {
         double[] ownVectorA = tupleA.getFirst();
         double maxOwnValueA = tupleA.getSecond();
 
-        MatrixService.printVector(ownVectorA);
+        //MatrixService.printVector(ownVectorA);
         System.out.println("maxOwnValue = " + maxOwnValueA + "\n");
 
         MyTuple tupleInvertA = powIterations.findOwnVector(MatrixService.invertMatrix(matrixA), epsilon, vecX0);
